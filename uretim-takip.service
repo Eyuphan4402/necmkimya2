@@ -1,0 +1,19 @@
+[Unit]
+Description=Uretim ve Stok Takip Uygulamasi
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/uretim-app
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=uretim-takip
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target

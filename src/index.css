@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .safe-area-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+/* =========================================================
+   5 DYNAMIC THEME DEFINITIONS (REAL WORKING STYLING)
+   ========================================================= */
+
+/* 1. Slate - Koyu Gece (Emerald & Slate) */
+[data-theme="slate"] {
+  --bg-page: #020617;
+  --bg-shell: #0f172a;
+  --bg-card: #1e293b;
+  --bg-subcard: #0f172a;
+  --bg-input: #0f172a;
+  --border-card: #334155;
+  --border-sub: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-text: #ffffff;
+  --color-primary-subtle: rgba(16, 185, 129, 0.15);
+  --color-primary-border: rgba(16, 185, 129, 0.35);
+  --header-bg: rgba(15, 23, 42, 0.95);
+  --nav-bg: rgba(15, 23, 42, 0.96);
+}
+
+/* 2. Ocean - Safir Okyanus (Cyan & Navy) */
+[data-theme="ocean"] {
+  --bg-page: #020b18;
+  --bg-shell: #081a36;
+  --bg-card: #0e2a52;
+  --bg-subcard: #06162d;
+  --bg-input: #06162d;
+  --border-card: #1b457e;
+  --border-sub: #10315c;
+  --text-main: #f0f9ff;
+  --text-muted: #93c5fd;
+  --text-subtle: #60a5fa;
+  --color-primary: #06b6d4;
+  --color-primary-hover: #0891b2;
+  --color-primary-text: #ffffff;
+  --color-primary-subtle: rgba(6, 182, 212, 0.18);
+  --color-primary-border: rgba(6, 182, 212, 0.38);
+  --header-bg: rgba(8, 26, 54, 0.95);
+  --nav-bg: rgba(8, 26, 54, 0.96);
+}
+
+/* 3. Amber - Endüstriyel Amber (Warm Amber & Charcoal) */
+[data-theme="amber"] {
+  --bg-page: #09090b;
+  --bg-shell: #18181b;
+  --bg-card: #27272a;
+  --bg-subcard: #121214;
+  --bg-input: #121214;
+  --border-card: #3f3f46;
+  --border-sub: #27272a;
+  --text-main: #fafafa;
+  --text-muted: #d4d4d8;
+  --text-subtle: #a1a1aa;
+  --color-primary: #f59e0b;
+  --color-primary-hover: #d97706;
+  --color-primary-text: #18181b;
+  --color-primary-subtle: rgba(245, 158, 11, 0.18);
+  --color-primary-border: rgba(245, 158, 11, 0.4);
+  --header-bg: rgba(24, 24, 27, 0.95);
+  --nav-bg: rgba(24, 24, 27, 0.96);
+}
+
+/* 4. Forest - Zümrüt Doğa (Pine Green & Teal) */
+[data-theme="forest"] {
+  --bg-page: #02120e;
+  --bg-shell: #06231a;
+  --bg-card: #0f382a;
+  --bg-subcard: #051a14;
+  --bg-input: #051a14;
+  --border-card: #18523f;
+  --border-sub: #0f382a;
+  --text-main: #ecfdf5;
+  --text-muted: #a7f3d0;
+  --text-subtle: #6ee7b7;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-text: #ffffff;
+  --color-primary-subtle: rgba(16, 185, 129, 0.2);
+  --color-primary-border: rgba(16, 185, 129, 0.4);
+  --header-bg: rgba(6, 35, 26, 0.95);
+  --nav-bg: rgba(6, 35, 26, 0.96);
+}
+
+/* 5. Light - Temiz Aydınlık (Clean White & Slate) */
+[data-theme="light"] {
+  --bg-page: #e2e8f0;
+  --bg-shell: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-subcard: #f1f5f9;
+  --bg-input: #ffffff;
+  --border-card: #cbd5e1;
+  --border-sub: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #64748b;
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-text: #ffffff;
+  --color-primary-subtle: rgba(5, 150, 105, 0.12);
+  --color-primary-border: rgba(5, 150, 105, 0.3);
+  --header-bg: rgba(255, 255, 255, 0.95);
+  --nav-bg: rgba(255, 255, 255, 0.96);
+}
+
+/* Utility classes mapping to CSS variables */
+.theme-bg-page {
+  background-color: var(--bg-page);
+}
+.theme-shell {
+  background-color: var(--bg-shell);
+  color: var(--text-main);
+  border-color: var(--border-card);
+}
+.theme-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-card);
+  color: var(--text-main);
+}
+.theme-subcard {
+  background-color: var(--bg-subcard);
+  border-color: var(--border-sub);
+}
+.theme-input {
+  background-color: var(--bg-input);
+  border-color: var(--border-card);
+  color: var(--text-main);
+}
+.theme-text-main {
+  color: var(--text-main);
+}
+.theme-text-muted {
+  color: var(--text-muted);
+}
+.theme-text-subtle {
+  color: var(--text-subtle);
+}
+.theme-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-text);
+}
+.theme-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+.theme-accent-badge {
+  background-color: var(--color-primary-subtle);
+  border-color: var(--color-primary-border);
+  color: var(--color-primary);
+}
+.theme-header {
+  background-color: var(--header-bg);
+  border-color: var(--border-card);
+}
+.theme-nav {
+  background-color: var(--nav-bg);
+  border-color: var(--border-card);
+}

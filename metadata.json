@@ -1,0 +1,6 @@
+{
+  "name": "Üretim, Stok ve Sevkiyat Takip",
+  "description": "Mobil uyumlu hammadde reçete hesaplama, üretim lotu ve SKT takibi ile hızlı stoktan düşümlü sevkiyat yönetim sistemi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

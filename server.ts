@@ -103,6 +103,47 @@ app.post('/api/data', (req, res) => {
   }
 });
 
+// Direct APK download route
+app.get('/download/necmkimya.apk', (req, res) => {
+  const apkPath = path.join(process.cwd(), 'public', 'NecmKimya_UretimTakip.apk');
+  const fallbackApkPath = path.join(process.cwd(), 'data', 'NecmKimya_UretimTakip.apk');
+  
+  if (fs.existsSync(apkPath)) {
+    return res.download(apkPath, 'NecmKimya_UretimTakip.apk');
+  } else if (fs.existsSync(fallbackApkPath)) {
+    return res.download(fallbackApkPath, 'NecmKimya_UretimTakip.apk');
+  } else {
+    // If not compiled yet, return helpful json or text
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>APK İndir - Necm Kimya</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; text-align: center; }
+            .card { max-width: 480px; margin: 40px auto; background: #1e293b; padding: 24px; border-radius: 16px; border: 1px solid #334155; }
+            h2 { color: #34d399; margin-top: 0; }
+            p { font-size: 14px; line-height: 1.6; color: #94a3b8; }
+            a.btn { display: inline-block; background: #10b981; color: #fff; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 16px; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <h2>📱 Mobil APK / PWA Kurulumu</h2>
+            <p>Uygulamanızı telefonunuza doğrudan indirmek için:</p>
+            <p>1. Telefonunuzun Chrome tarayıcısında sağ üstteki <strong>3 noktaya (⋮)</strong> dokunun.<br/>
+            2. <strong>"Uygulamayı Yükle"</strong> butonuna basarak Google Play gibi anında kurabilirsiniz.</p>
+            <p>Derlenmiş özel .apk dosyasını sunucunuzun <code>/var/www/necmkimya2/public/NecmKimya_UretimTakip.apk</code> klasörüne yerleştirebilirsiniz.</p>
+            <a class="btn" href="/">Ana Sayfaya Dön</a>
+          </div>
+        </body>
+      </html>
+    `);
+  }
+});
+
 // Reset server data
 app.post('/api/reset', (req, res) => {
   try {

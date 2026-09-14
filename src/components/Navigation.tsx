@@ -9,6 +9,8 @@ import {
   Check,
   Server,
   Cloud,
+  Smartphone,
+  Download,
 } from 'lucide-react';
 import { ActiveTab, AppTheme } from '../types';
 
@@ -108,6 +110,7 @@ interface HeaderProps {
   currentTheme: AppTheme;
   onSelectTheme: (theme: AppTheme) => void;
   serverStatus?: 'connected' | 'offline' | 'syncing';
+  onOpenApkModal?: () => void;
 }
 
 export const TopHeader = ({
@@ -117,6 +120,7 @@ export const TopHeader = ({
   currentTheme,
   onSelectTheme,
   serverStatus = 'connected',
+  onOpenApkModal,
 }: HeaderProps) => {
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
@@ -199,6 +203,20 @@ export const TopHeader = ({
                 : 'Yerel'}
             </span>
           </div>
+
+          {/* APK / App Install Button */}
+          {onOpenApkModal && (
+            <button
+              id="btn-open-apk-modal"
+              type="button"
+              onClick={onOpenApkModal}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition"
+              title="Uygulamayı Telefona Yükle / APK İndir"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">APK / Yükle</span>
+            </button>
+          )}
 
           {/* Theme Switcher Button */}
           <button

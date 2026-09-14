@@ -12,6 +12,7 @@ import { StockLotsTab } from './components/StockLotsTab';
 import { QuickShipmentTab } from './components/QuickShipmentTab';
 import { NewBatchModal } from './components/NewBatchModal';
 import { NewRecipeModal } from './components/NewRecipeModal';
+import { InstallApkModal } from './components/InstallApkModal';
 import { getSKTStatus } from './utils/dateUtils';
 import { THEMES } from './utils/theme';
 import { fetchServerData, saveServerData } from './utils/apiSync';
@@ -74,6 +75,7 @@ export default function App() {
   }>({});
 
   const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
+  const [isApkModalOpen, setIsApkModalOpen] = useState(false);
 
   // Shipment preselection
   const [preselectedBatchId, setPreselectedBatchId] = useState<string | null>(
@@ -310,6 +312,7 @@ export default function App() {
           currentTheme={currentTheme}
           onSelectTheme={setCurrentTheme}
           serverStatus={serverStatus}
+          onOpenApkModal={() => setIsApkModalOpen(true)}
         />
 
         {/* Tab Content Body */}
@@ -384,6 +387,11 @@ export default function App() {
         isOpen={isRecipeModalOpen}
         onClose={() => setIsRecipeModalOpen(false)}
         onSaveRecipe={handleSaveNewRecipe}
+      />
+
+      <InstallApkModal
+        isOpen={isApkModalOpen}
+        onClose={() => setIsApkModalOpen(false)}
       />
     </div>
   );

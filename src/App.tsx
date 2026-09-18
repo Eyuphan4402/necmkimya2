@@ -13,6 +13,7 @@ import { QuickShipmentTab } from './components/QuickShipmentTab';
 import { NewBatchModal } from './components/NewBatchModal';
 import { NewRecipeModal } from './components/NewRecipeModal';
 import { InstallApkModal } from './components/InstallApkModal';
+import { ServerDashboardTab } from './components/ServerDashboardTab';
 import { getSKTStatus } from './utils/dateUtils';
 import { THEMES } from './utils/theme';
 import { fetchServerData, saveServerData } from './utils/apiSync';
@@ -35,11 +36,24 @@ export default function App() {
     }
   });
 
-  // State with LocalStorage persistence
+  // Keep html element data-theme attribute in sync
+  useEffect(() => {
+    try {
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    } catch {
+      // ignore
+    }
+  }, [currentTheme]);
+
+  // State with LocalStorage persistence - validated as arrays
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.RECIPES);
-      return saved ? JSON.parse(saved) : INITIAL_RECIPES;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return INITIAL_RECIPES;
     } catch {
       return INITIAL_RECIPES;
     }
@@ -48,7 +62,11 @@ export default function App() {
   const [batches, setBatches] = useState<ProductionBatch[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.BATCHES);
-      return saved ? JSON.parse(saved) : INITIAL_BATCHES;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      return INITIAL_BATCHES;
     } catch {
       return INITIAL_BATCHES;
     }
@@ -57,7 +75,11 @@ export default function App() {
   const [shipments, setShipments] = useState<ShipmentOrder[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.SHIPMENTS);
-      return saved ? JSON.parse(saved) : INITIAL_SHIPMENTS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      return INITIAL_SHIPMENTS;
     } catch {
       return INITIAL_SHIPMENTS;
     }
@@ -300,7 +322,7 @@ export default function App() {
     >
       {/* Main Fluid Responsive Container */}
       <div className="w-full max-w-7xl mx-auto flex-1 flex flex-col relative min-h-screen">
-        {/* Top Header with Theme Switcher */}
+        {/* Top Header with Theme Switcher & Desktop Navigation */}
         <TopHeader
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -313,6 +335,8 @@ export default function App() {
           onSelectTheme={setCurrentTheme}
           serverStatus={serverStatus}
           onOpenApkModal={() => setIsApkModalOpen(true)}
+          criticalSKTCount={criticalSKTCount}
+          stockCount={batches.reduce((sum, b) => sum + (Number(b.currentQuantity) || 0), 0)}
         />
 
         {/* Tab Content Body */}
@@ -358,6 +382,10 @@ export default function App() {
               preselectedBatchId={preselectedBatchId}
               onClearPreselection={() => setPreselectedBatchId(null)}
             />
+          )}
+
+          {activeTab === 'server-dashboard' && (
+            <ServerDashboardTab onBackToProduction={() => setActiveTab('recipe')} />
           )}
         </main>
 

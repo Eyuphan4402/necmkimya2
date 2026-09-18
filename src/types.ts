@@ -60,7 +60,7 @@ export interface ShipmentOrder {
 // Deprecated single record for backward compatibility
 export type ShipmentRecord = ShipmentOrder;
 
-export type ActiveTab = 'recipe' | 'daily' | 'stock' | 'shipment';
+export type ActiveTab = 'recipe' | 'daily' | 'stock' | 'shipment' | 'server-dashboard';
 
 export type AppTheme = 'slate' | 'ocean' | 'amber' | 'forest' | 'light';
 

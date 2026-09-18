@@ -26,8 +26,8 @@
    5 DYNAMIC THEME DEFINITIONS (REAL WORKING STYLING)
    ========================================================= */
 
-/* 1. Slate - Koyu Gece (Emerald & Slate) */
-[data-theme="slate"] {
+/* Default root variables (Slate - Koyu Gece) */
+:root, html, body, [data-theme="slate"] {
   --bg-page: #020617;
   --bg-shell: #0f172a;
   --bg-card: #1e293b;

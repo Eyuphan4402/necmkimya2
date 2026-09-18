@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Smartphone, Download, CheckCircle2, ShieldCheck, HelpCircle, ExternalLink, QrCode } from 'lucide-react';
+import { Smartphone, Download, CheckCircle2, ShieldCheck, HelpCircle, ExternalLink, QrCode, Code2, Play, FolderGit2 } from 'lucide-react';
 
 interface InstallApkModalProps {
   isOpen: boolean;
@@ -9,37 +9,56 @@ interface InstallApkModalProps {
 export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [activeTab, setActiveTab] = useState<'pwa' | 'apk'>('pwa');
+  const [activeTab, setActiveTab] = useState<'pwa' | 'studio' | 'apk'>('studio');
+  const [infoNotice, setInfoNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if running in standalone/installed mode
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
-    setIsInstalled(isStandalone);
+    try {
+      // Check if running in standalone/installed mode safely
+      const isStandalone =
+        (typeof window !== 'undefined' && window.matchMedia
+          ? window.matchMedia('(display-mode: standalone)').matches
+          : false) ||
+        (typeof navigator !== 'undefined' && (navigator as any).standalone === true);
+      setIsInstalled(!!isStandalone);
 
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
+      const handleBeforeInstallPrompt = (e: Event) => {
+        try {
+          e.preventDefault();
+          setDeferredPrompt(e);
+        } catch {
+          // ignore in restricted iframe
+        }
+      };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      };
+    } catch {
+      // ignore
+    }
   }, []);
 
   if (!isOpen) return null;
 
   const handlePwaInstall = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-        setIsInstalled(true);
+      try {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          setDeferredPrompt(null);
+          setIsInstalled(true);
+        }
+      } catch (err) {
+        console.error('Install prompt error:', err);
       }
     } else {
-      // Fallback hint
-      alert('Tarayıcınızın menüsünden (sağ üst 3 nokta) "Uygulamayı Yükle" veya "Ana Ekrana Ekle" seçeneğine dokunarak anında telefonunuza kurabilirsiniz!');
+      // Inline notice instead of window.alert to prevent iframe restriction crashes
+      setInfoNotice(
+        'Tarayıcınızın menüsünden (sağ üst 3 nokta) "Uygulamayı Yükle" veya "Ana Ekrana Ekle" seçeneğine tıklayarak uygulamayı cihazınıza kurabilirsiniz.'
+      );
     }
   };
 
@@ -79,7 +98,20 @@ export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
         </div>
 
         {/* Tab Toggle */}
-        <div className="flex border-b border-inherit p-1 bg-black/10">
+        <div className="flex border-b border-inherit p-1 bg-black/10 gap-1">
+          <button
+            type="button"
+            id="tab-install-studio"
+            onClick={() => setActiveTab('studio')}
+            className={`flex-1 py-2 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 ${
+              activeTab === 'studio'
+                ? 'theme-btn-primary shadow'
+                : 'theme-text-muted hover:theme-text-main'
+            }`}
+          >
+            <Code2 className="w-4 h-4" />
+            1. Android Studio ile APK
+          </button>
           <button
             type="button"
             id="tab-install-pwa"
@@ -91,7 +123,7 @@ export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
             }`}
           >
             <Smartphone className="w-4 h-4" />
-            1. Anında Telefona Kur (PWA Uygulama)
+            2. Anında Kur (PWA)
           </button>
           <button
             type="button"
@@ -104,13 +136,74 @@ export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
             }`}
           >
             <Download className="w-4 h-4" />
-            2. Özel .APK Dosyası İndir
+            3. Hazır APK
           </button>
         </div>
 
         {/* Modal Content */}
         <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
-          {activeTab === 'pwa' ? (
+          {activeTab === 'studio' ? (
+            <div className="space-y-4">
+              <div className="p-3.5 rounded-xl theme-subcard border space-y-3">
+                <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+                  <FolderGit2 className="w-4 h-4" />
+                  <span>Tamamen Native Android Studio APK Projesi</span>
+                </div>
+                <p className="text-xs theme-text-muted leading-relaxed">
+                  Artık projenizde <strong>settings.gradle</strong>, <strong>build.gradle</strong>, <strong>app/src/main/AndroidManifest.xml</strong> ve <strong>MainActivity.kt</strong> native kodları hazır! Android Studio projeyi açtığında artık <em>web uygulaması</em> olarak değil, <strong>doğrudan Native Android Projesi</strong> olarak tanır.
+                </p>
+
+                {/* Direct ZIP Download */}
+                <a
+                  id="link-download-android-project-zip"
+                  href="/download/android-project.zip"
+                  download="NecmKimya_Android_Studio_Projesi.zip"
+                  className="w-full py-3 px-4 rounded-xl theme-btn-primary font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition"
+                >
+                  <Download className="w-4 h-4" />
+                  Android Studio Projesini İndir (.ZIP)
+                </a>
+              </div>
+
+              {/* Step by step Android Studio Guide */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <Play className="w-3.5 h-3.5" />
+                  Android Studio'da APK Üretme Adımları (1 Dakika):
+                </h4>
+                <div className="space-y-2 text-xs theme-text-muted">
+                  <div className="p-2.5 rounded-lg bg-black/15 border border-inherit flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
+                    <div>
+                      <strong className="theme-text-main">Projeyi Açın:</strong>
+                      <p className="opacity-90">İndirdiğiniz zip dosyasını klasöre çıkartın. Android Studio'yu açıp <code className="bg-black/30 px-1 py-0.5 rounded text-emerald-300">File &gt; Open</code> menüsünden bu klasörü (veya içindeki <code className="bg-black/30 px-1 py-0.5 rounded text-emerald-300">android/</code> klasörünü) seçin.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-black/15 border border-inherit flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
+                    <div>
+                      <strong className="theme-text-main">Gradle Senkronizasyonu:</strong>
+                      <p className="opacity-90">Android Studio otomatik olarak Gradle'ı senkronize edecek ve sol tarafta standart <code className="bg-black/30 px-1 py-0.5 rounded text-emerald-300">app &gt; manifests &gt; java &gt; res</code> Android ağacını gösterecektir.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-black/15 border border-inherit flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
+                    <div>
+                      <strong className="theme-text-main">APK Oluşturun:</strong>
+                      <p className="opacity-90">Üst menüden <code className="bg-black/30 px-1 py-0.5 rounded text-emerald-300">Build &gt; Build Bundle(s) / APK(s) &gt; Build APK(s)</code> seçeneğine tıklayın. Tamamlandığında sağ altta açılan <strong>"locate"</strong> bildirimine tıklayarak <code className="bg-black/30 px-1 py-0.5 rounded text-emerald-300">app-debug.apk</code> dosyanızı alın.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>Tüm HTML/JS/CSS formül ve üretim motoru APK'nın içine gömülüdür; üretilen APK internet olmasa bile depoda tam performans çalışır!</span>
+              </div>
+            </div>
+          ) : activeTab === 'pwa' ? (
             <div className="space-y-4">
               <div className="p-3.5 rounded-xl theme-subcard border space-y-2">
                 <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
@@ -136,6 +229,12 @@ export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
                     <Download className="w-4 h-4" />
                     Telefona Doğrudan Uygulama Olarak Yükle
                   </button>
+                )}
+
+                {infoNotice && (
+                  <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs leading-relaxed">
+                    {infoNotice}
+                  </div>
                 )}
               </div>
 

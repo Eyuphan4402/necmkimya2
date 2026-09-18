@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   FlaskConical,
   CalendarCheck,
+  Calendar,
   Package,
   Truck,
   Sparkles,
@@ -59,7 +60,7 @@ export const BottomNavigation = ({
     <nav
       id="mobile-bottom-nav"
       aria-label="Ana Navigasyon"
-      className="sticky bottom-0 left-0 right-0 z-40 theme-nav backdrop-blur-md border-t safe-area-bottom shadow-2xl transition-colors duration-200"
+      className="md:hidden sticky bottom-0 left-0 right-0 z-40 theme-nav backdrop-blur-md border-t safe-area-bottom shadow-2xl transition-colors duration-200"
     >
       <div className="w-full max-w-md md:max-w-2xl mx-auto grid grid-cols-4 gap-1 sm:gap-2 px-2 sm:px-4 py-2">
         {tabs.map((tab) => {
@@ -111,16 +112,21 @@ interface HeaderProps {
   onSelectTheme: (theme: AppTheme) => void;
   serverStatus?: 'connected' | 'offline' | 'syncing';
   onOpenApkModal?: () => void;
+  criticalSKTCount?: number;
+  stockCount?: number;
 }
 
 export const TopHeader = ({
   activeTab,
+  setActiveTab,
   onOpenNewBatch,
   onOpenNewRecipe,
   currentTheme,
   onSelectTheme,
   serverStatus = 'connected',
   onOpenApkModal,
+  criticalSKTCount = 0,
+  stockCount = 0,
 }: HeaderProps) => {
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
 
@@ -141,7 +147,13 @@ export const TopHeader = ({
       title: 'Sevkiyat & İrsaliye',
       subtitle: 'Çoklu ürün ve lot seçimi ile hızlı düşüş',
     },
+    'server-dashboard': {
+      title: 'Sunucu & APK Dashboard',
+      subtitle: 'VPS sistem sağlığı, APK dağıtımı ve veritabanı yönetimi',
+    },
   };
+
+  const currentTitleInfo = titles[activeTab] || titles.recipe;
 
   const themeList: { id: AppTheme; label: string; color: string }[] = [
     { id: 'slate', label: 'Koyu Gece', color: 'bg-emerald-500' },
@@ -151,33 +163,94 @@ export const TopHeader = ({
     { id: 'light', label: 'Temiz Aydınlık', color: 'bg-emerald-600' },
   ];
 
+  const navItems: { id: ActiveTab; label: string; icon: any; badge?: number }[] = [
+    { id: 'recipe', label: 'Reçeteler', icon: FlaskConical },
+    { id: 'daily', label: 'Günlük Üretim', icon: Calendar },
+    { id: 'stock', label: 'Stok & Lot', icon: Package, badge: criticalSKTCount },
+    { id: 'shipment', label: 'Sevkiyat', icon: Truck },
+    { id: 'server-dashboard', label: 'Sunucu & APK', icon: Server },
+  ];
+
   return (
     <header
       id="top-header"
-      className="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-3 sm:px-4 py-2.5 transition-colors duration-200"
+      className="sticky top-0 z-30 theme-header backdrop-blur-md border-b px-3 sm:px-4 md:px-6 py-2.5 transition-colors duration-200"
     >
-      <div className="w-full max-w-md md:max-w-4xl mx-auto flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-xl theme-btn-primary flex items-center justify-center shadow-md shrink-0">
-            <Sparkles className="w-4 h-4" />
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3">
+        {/* Left: Brand / Title */}
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-9 h-9 rounded-xl theme-btn-primary flex items-center justify-center shadow-md shrink-0">
+            {activeTab === 'server-dashboard' ? (
+              <Server className="w-4 h-4" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <h1 className="text-sm sm:text-base font-bold theme-text-main leading-tight truncate">
-                {titles[activeTab].title}
+                {currentTitleInfo.title}
               </h1>
             </div>
             <p className="text-[10px] sm:text-[11px] theme-text-muted leading-tight truncate">
-              {titles[activeTab].subtitle}
+              {currentTitleInfo.subtitle}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 relative">
+        {/* Center: Desktop Navigation Bar (Visible on PC / Tablet >= md) */}
+        <nav className="hidden md:flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-inherit">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                id={`desktop-nav-${item.id}`}
+                type="button"
+                onClick={() => setActiveTab(item.id)}
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                  isActive
+                    ? 'theme-btn-primary shadow-sm font-bold'
+                    : 'theme-text-muted hover:theme-text-main hover:bg-white/5'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{item.label}</span>
+                {item.badge && item.badge > 0 ? (
+                  <span className="ml-1 text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 ring-1 ring-inherit">
+                    {item.badge}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Right: Controls & Server Status */}
+        <div className="flex items-center gap-1.5 relative shrink-0">
+          {/* Server Dashboard / App Toggle (Mobile only, on desktop it is in center tabs) */}
+          <button
+            id="btn-toggle-server-dashboard"
+            type="button"
+            onClick={() => setActiveTab(activeTab === 'server-dashboard' ? 'recipe' : 'server-dashboard')}
+            className={`md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition shadow-sm ${
+              activeTab === 'server-dashboard'
+                ? 'bg-indigo-600 text-white border-indigo-500'
+                : 'theme-subcard theme-text-muted hover:theme-text-main border-inherit'
+            }`}
+            title={activeTab === 'server-dashboard' ? 'Üretim Uygulamasına Dön' : 'Sunucu & APK Dashboardunu Aç'}
+          >
+            <Server className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden sm:inline">
+              {activeTab === 'server-dashboard' ? 'Üretim' : 'Sunucu'}
+            </span>
+          </button>
+
           {/* Server Sync Status Badge */}
           <div
             id="badge-server-sync"
-            className="flex items-center gap-1.5 px-2 py-1 rounded-lg theme-subcard border text-[10px] font-semibold transition"
+            className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg theme-subcard border text-[10px] font-semibold transition"
             title={
               serverStatus === 'connected'
                 ? 'Ubuntu Sunucuya Bağlı (62.171.177.210)'

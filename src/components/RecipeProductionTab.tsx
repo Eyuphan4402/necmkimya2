@@ -65,7 +65,8 @@ export const RecipeProductionTab = ({
 
   // Reusable detail card for both unfolded side-pane and folded modal
   const renderFormulaContent = (targetRecipe: Recipe, isSidePane = false) => {
-    const totalPercentage = targetRecipe.ingredients.reduce(
+    const ingredients = targetRecipe.ingredients || [];
+    const totalPercentage = ingredients.reduce(
       (sum, ing) => sum + (Number(ing.percentage) || 0),
       0
     );
@@ -153,7 +154,7 @@ export const RecipeProductionTab = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs px-1">
             <span className="font-bold theme-text-main">
-              Hammadde Dağılımı ({targetRecipe.ingredients.length} Kalem)
+              Hammadde Dağılımı ({ingredients.length} Kalem)
             </span>
             <span className="font-semibold text-[11px] theme-text-muted">
               Toplam: %{totalPercentage.toFixed(1)}
@@ -161,7 +162,7 @@ export const RecipeProductionTab = ({
           </div>
 
           <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-            {targetRecipe.ingredients.map((ing) => {
+            {ingredients.map((ing) => {
               const requiredUnits = (
                 (ing.percentage / 100) *
                 calcBatchSize

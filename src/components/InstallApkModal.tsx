@@ -174,15 +174,25 @@ export const InstallApkModal = ({ isOpen, onClose }: InstallApkModalProps) => {
                   className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition"
                 >
                   <Download className="w-4 h-4" />
-                  NecmKimya_UretimTakip.apk İndir (v1.0.0)
+                  NecmKimya_UretimTakip.apk İndir
                 </a>
               </div>
 
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs space-y-1.5">
-                <p className="font-semibold">💡 Bilgilendirme:</p>
+              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs space-y-1.5">
+                <p className="font-semibold">🚀 En Rahat Yöntem (APK Beklemeden):</p>
                 <p className="leading-relaxed opacity-90">
-                  Android telefonunuza indirdikten sonra <em>"Bilinmeyen kaynaklardan uygulama yükleme"</em> izni vererek APK'yı kurabilirsiniz.
-                  Uygulama doğrudan <strong>62.171.177.210</strong> sunucunuzdaki veritabanına bağlanır.
+                  APK derlemesiyle uğraşmak istemiyorsanız, <strong>1. Sekme (PWA Uygulama)</strong> üzerinden 
+                  Chrome menüsünden <strong>"Uygulamayı Yükle"</strong>ye dokunduğunuz anda telefonunuza 
+                  tam ekran, bildirim ve ikon desteğiyle orijinal Android uygulaması kurulur!
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs space-y-1.5">
+                <p className="font-semibold">📦 Kendi Derlediğiniz APK'yı Eklemek İçin:</p>
+                <p className="leading-relaxed opacity-90">
+                  Android Studio'da ürettiğiniz <code>app-release.apk</code> dosyasını sunucunuzda 
+                  <code>/root/necmkimya2/necmkimya2/public/NecmKimya_UretimTakip.apk</code> konumuna attığınızda 
+                  yukarıdaki buton doğrudan o gerçek APK dosyasını indirecektir.
                 </p>
               </div>
             </div>
